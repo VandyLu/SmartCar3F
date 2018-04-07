@@ -6,9 +6,15 @@ import smartcarlib.PID as PID
 
 import cv2
 import collections.namedtuple
+import itertools
 
 PicarParams = namedtuple('PicarParams',
-                         ['threshold'])
+                         ['threshold',
+                          'steer_kp',
+                          'steer_ki',
+                          'steer_kd',
+                          'control_interval' # one interval=50ms
+                         ])
 
 class Picar():
 
@@ -23,13 +29,40 @@ class Picar():
     def cruise(self):
         ''' Cruise black line
         '''
+        stop = False
+        steer_pid = PID.PID(self.params.steer_kp,
+                            self.params.steer_ki,
+                            self.params,steer_kd)
+
+        for t in itertools.count():
+            image = self.query_camera(self.front, flip=True)
+            height, width, _ = image.shape
+
+            line_mask = cv.blackline_detection(image, self.params.threshold, method='close')
+            points, points_image = cv.target_points_detection(line_mask, 3)
+            print(points.shape)
         
-        image = self.query_camera(self.front)
+            # Take the middle point as target
+            middle_x = width / 2
+            target_x, target_y = points[1, 0], points[1, 1]
 
-        # Segment the black line to points list nx2
-        points = smartcarlib.cv.line_segment(image, self.params.threshold)
+            # Limit the frequency of control signal
+            if t % self.params.control_interval == 0:
+                error_x = (target_x - middle_x) / width # [0,1)
+                steer_value = steer_pid.update(error_x) # positive -> turn right
+                self.driver.setStatus(motor=0.3, servo=steer_value, mode='speed')
 
-        # Get target 
+            cv2.imshow('frame', image)
+            cv2.imshow('points', points_image)
+
+            if 27 == cv2.waitKey(50): # Manually stop
+                stop = True
+        
+            if stop:
+                self.driver.setStatus(motor=0, servo=0, mode='speed')
+                break
+        
+        print('Picar-cruise stopped, time: {}s'.format(t*50/1000))
 
 
     def park(self):
@@ -71,7 +104,11 @@ class Picar():
 
 if __name__ == '__main__':
     # Test Picar
-    params = PicarParams(threshold=100.0)
+    params = PicarParams(threshold=100.0,
+                         steer_kp=1.0,
+                         steer_ki=0.0,
+                         steer_kd=0.0,
+                         control_interval=10) 
     picar = Picar(params)
     picar.test()
 
