@@ -78,7 +78,7 @@ class Picar():
         '''
         assert cam_id in (0, 1)
 
-        ret, frame = self.cap[cam_id]
+        ret, frame = self.cap[cam_id].read()
         if flip:
             frame = cv2.flip(frame, 0)
         return frame
@@ -89,14 +89,22 @@ class Picar():
         self.__test_blackline_detection()
 
     def __test_blackline_detection(self):
-        while True:
+        n = 0
+        print 'Press C to take a photo, restored in test_images/'
+        for i in itertools.count():
             frame = self.query_camera(self.front, flip=True)
-            line_mask = cv.blackline_detection(frame, threshold=self.threshold)
+            line_mask = cv.blackline_detection(frame, threshold=self.params.threshold)
             target_points, target_image = cv.target_points_detection(line_mask, 3)
 
             cv2.imshow('frame', frame)
             cv2.imshow('target_image', target_image)
             c = cv2.waitKey(30)
+
+            if c == ord('c'):
+                print 'test_{:03d}.jpeg'.format(n)
+                cv2.imwrite('images/test_{:03d}.jpeg'.format(n), frame)
+                n += 1
+
             if c == 27 or c == ord('q'):
                 break
 
@@ -112,4 +120,6 @@ if __name__ == '__main__':
     picar = Picar(params)
     picar.test()
 
+    print('Exit done!')
+    picar.driver.close()
 
