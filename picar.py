@@ -5,7 +5,7 @@ import smartcarlib.driver as driver
 import smartcarlib.PID as PID
 
 import cv2
-import collections.namedtuple
+from collections import namedtuple
 import itertools
 
 PicarParams = namedtuple('PicarParams',
