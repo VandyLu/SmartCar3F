@@ -98,7 +98,7 @@ class Picar():
 
             cv2.imshow('frame', frame)
             cv2.imshow('target_image', target_image)
-            c = cv2.waitKey(30)
+            c = cv2.waitKey(300)
 
             if c == ord('c'):
                 print 'test_{:03d}.jpeg'.format(n)
