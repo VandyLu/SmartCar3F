@@ -6,16 +6,38 @@ import cv2
 import numpy as np
 from skimage import measure
 
-def blackline_detection(image, threshold=10.0):
+def blackline_detection(image):
     ''' Detect black line, do GaussianBlur or Closed operation to avoid errors
     '''
+    height = image.shape(0)
+    width = image.shape(1)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-    #detect_hline
-
-    #detect_vline
-
-
+    edges = cv2.Canny(image, 50, 150, apertureSize=3)
+    lines = cv2.HoughLines(edges, 1, np.pi / 180, 110)
+    lines = np.squeeze(lines, 1)
+    i_v = 0
+    i_h = 0
+    k_v = 0  # k of the vertical line
+    b_v = 0  # b of the vertical line
+    k_h = 0  # k of the horizontal line
+    b_h = 0  # b of the horizontal line
+    for r, theta in lines:
+        if (theta < (np.pi / 4)) or (theta > (3 * np.pi / 4)):  # vertical line
+            k_v = np.pi / 2 - theta + k_v
+            b_v = int(r / np.sin(theta)) + b_v
+            i_v = i_v + 1
+        else:  # horizontal line
+            k_h = np.pi / 2 - theta + k_h
+            b_h = int(r / np.sin(theta)) + b_h
+            i_h = i_h + 1
+    k_v = np.tan(k_v / i_v)  # average
+    b_v = b_v / i_v
+    k_h = np.tan(k_h / i_h)
+    b_h = b_h / i_h
+    pt1 = (int(b_v / k_v), 0)
+    pt2 = (int((b_v + height) / k_v), height)
+    mask = np.zeros((height, width, 3), dtype=np.uint8)
+    mask = cv2.line(mask, pt1, pt2, (255, 255, 255))
     return mask
 
                   
