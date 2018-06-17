@@ -27,5 +27,6 @@ def crop(img):
 
 img = cv2.imread('T1.jpg')
 mask = crop(img)
+cv2.imwrite('T4.1.jpg',mask)
 cv2.imshow('1', mask)
 cv2.waitKey()

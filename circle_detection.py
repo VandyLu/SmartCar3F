@@ -13,7 +13,7 @@ def circle_detect(img, kernel_size=(5,5)):
     cv2.waitKey()
     return x, y, r
 
-img = cv2.imread('T4.jpg')
+img = cv2.imread('T4.1.jpg')
 x, y, r = circle_detect(img, (5,5))
 print(x)
 print(y)
