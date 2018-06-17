@@ -11,8 +11,13 @@ def blackline_detection(image, threshold=10.0):
     '''
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
+    #detect_hline
+
+    #detect_vline
+
 
     return mask
+
                   
 def calculate_center(image):
     ''' Calculate center of a binary image
