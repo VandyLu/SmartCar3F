@@ -6,34 +6,12 @@ import cv2
 import numpy as np
 from skimage import measure
 
-def blackline_detection(image, threshold=10.0, method='close'):
+def blackline_detection(image, threshold=10.0):
     ''' Detect black line, do GaussianBlur or Closed operation to avoid errors
     '''
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    if method == 'blur':
-        blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-        _, mask = cv2.threshold(blurred, threshold, 255, cv2.THRESH_BINARY_INV)
-    elif method == 'close':
-        # Do close operation to filter out errors of black line
-        #threshold = 100
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
-        _, mask = cv2.threshold(gray, threshold, 255, cv2.THRESH_BINARY_INV)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-        mask = cv2.Sobel(mask, -1, 2, 0, ksize=1);
-        kernel = np.ones((2, 2), np.uint8)
-        mask = cv2.dilate(mask, kernel, iterations=1)
-        labels = measure.label(mask, connectivity=1)
 
-        # print('regions number:',labels.max()+1)
-        for region in measure.regionprops(labels):
-
-            if region.area < 15:
-                x = region.coords
-                for i in x:
-                    mask[i[0], i[1]] = 255 - mask[i[0], i[1]]
     return mask
                   
 def calculate_center(image):

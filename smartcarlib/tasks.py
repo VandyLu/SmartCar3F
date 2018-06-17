@@ -29,9 +29,8 @@ def cruise(params, caps, driver):
 
         image = utils.query_camera(caps[0], flip=True)
 
-        line_mask = cv.blackline_detection(image, params.threshold, method='close')
+        line_mask = cv.blackline_detection(image, params.threshold)
         points, points_image = cv.target_points_detection(line_mask, 3)
-        # (N, 2)
 
         # Take the middle point as target
         middle_x = width / 2
