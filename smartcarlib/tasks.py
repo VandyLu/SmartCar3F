@@ -21,7 +21,6 @@ def cruise(params, caps, driver):
                         params.steer_kd)
 
     image = utils.query_camera(caps[0], flip=True)
-    height, width, channels = image.shape
 
 
     for t in itertools.count():
@@ -30,6 +29,7 @@ def cruise(params, caps, driver):
         image = utils.query_camera(caps[0], flip=True)
         
         cruise_roi = utils.crop(image, 0.5, 0.4)
+        height, width, channels = cruise_roi.shape
 
         line_mask = cv.blackline_detection(cruise_roi, params.threshold)
         points, points_image = cv.target_points_detection(line_mask, 1)
