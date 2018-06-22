@@ -2,12 +2,14 @@ import cv2
 from .cv import * 
 from .utils import *
 
-def __test_blackline_detection(params, caps, driver):
+import itertools
+
+def test_blackline_detection(params, caps, driver):
     n = 0
     print 'Press C to take a photo, restored in test_images/'
     for i in itertools.count():
         frame = query_camera(caps[0], flip=True)
-        line_mask = blackline_detection(frame, threshold=self.params.threshold)
+        line_mask = blackline_detection(frame, threshold=params.threshold)
         target_points, target_image = target_points_detection(line_mask, 3)
 
         cv2.imshow('frame', frame)

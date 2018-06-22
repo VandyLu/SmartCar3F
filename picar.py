@@ -22,7 +22,7 @@ class Picar():
         self.front = 0
         self.back = 1
         self.cap = [cv2.VideoCapture(i) for i in range(2)]
-        self.driver = driver.driver()
+        self.driver = None #driver.driver()
 
     def cruise(self):
         tasks.cruise(self.params, self.cap, self.driver)
@@ -35,7 +35,7 @@ class Picar():
     def test(self):
         ''' Test to run on picar
         '''
-        tests.__test_blackline_detection(self.params, self.cap, self.driver)
+        tests.test_blackline_detection(self.params, self.cap, self.driver)
         print('Test blackline: OK')
 
     
