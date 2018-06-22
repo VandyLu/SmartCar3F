@@ -41,14 +41,14 @@ class Picar():
     
 if __name__ == '__main__':
     # Test Picar
-    params = PicarParams(threshold=100.0,
+    params = PicarParams(threshold=64.0,
                          steer_kp=1.0,
                          steer_ki=0.0,
                          steer_kd=0.0,
-                         control_interval=10) 
+                         control_interval=50) 
 
     picar = Picar(params)
-    picar.test()
+    picar.cruise()
 
     print('Exit done!')
     picar.driver.close()

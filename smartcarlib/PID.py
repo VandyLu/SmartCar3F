@@ -10,7 +10,7 @@ class PID():
         self.int_e = 0.0
         self.last_e = 0.0
 
-    def update(err):
+    def update(self, err):
         output = self.kp * err + self.ki * self.int_e + self.kd * (err - self.last_e)
         # Update integral and derivative
         self.int_e += err

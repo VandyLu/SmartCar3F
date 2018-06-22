@@ -6,16 +6,16 @@ import cv2
 import numpy as np
 from skimage import measure
 
-def blackline_detection(image, threshold=10.0):
+def blackline_detection(image, threshold=64, erode_iters=3):
     ''' Detect black line, do GaussianBlur or Closed operation to avoid errors
     '''
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    blur = cv2.GaussianBlur(gray, (5,5), 1.5)
+    _, binary = cv2.threshold(blur, threshold, 255, cv2.THRESH_BINARY_INV)
 
-    #detect_hline
+    erode = cv2.erode(binary, np.ones((5,5), np.uint8), iterations=erode_iters)
 
-    #detect_vline
-
-
+    mask = erode
     return mask
 
                   
@@ -31,6 +31,9 @@ def calculate_center(image):
 
     valid_x = xmap[valid_mask]
     valid_y = ymap[valid_mask]
+
+    #if np.sum(valid_x) == 0 or np.sum(valid_y) == 0:
+    #    return None, None
 
     mean_x = np.mean(valid_x)
     mean_y = np.mean(valid_y)
@@ -55,8 +58,8 @@ def target_points_detection(line_mask, num=1):
 
         tmp[int(mean_y-3): int(mean_y+3), int(mean_x-3): int(mean_x+3)] = 128
 
-    cv2.imshow('tmp', tmp)
-    cv2.waitKey()
+    #cv2.imshow('tmp', tmp)
+    #cv2.waitKey()
     return tars, tmp
 
 

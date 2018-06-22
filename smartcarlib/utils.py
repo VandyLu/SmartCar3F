@@ -1,6 +1,17 @@
 import cv2
 
 
+def crop(image, hratio, wratio):
+    ''' crop the downside of the image
+    '''
+    height, width = image.shape[0], image.shape[1]
+
+    hstart = int(height * (1.0 - hratio))
+    wstart = int(width * (1.0 - wratio) / 2.0)
+    wend = wstart + int(width * wratio)
+    return image[hstart: , wstart:wend]
+
+
 def query_camera(capture, flip=True):
     ''' Get a frame from front/back camera
         Input:
@@ -9,5 +20,6 @@ def query_camera(capture, flip=True):
     '''
     ret, frame = capture.read()
     if flip:
-        frame = cv2.flip(frame, 0)
+        frame = frame[::-1, ::-1]
+
     return frame
