@@ -13,7 +13,7 @@ def test_blackline_detection(params, caps, driver):
     image = crop(image, 0.5, 0.4)
 
     print(image.shape)
-    line_mask = blackline_detection(image, threshold=params.threshold)
+    line_mask = blackline_detection(image, threshold=params.cruise_params.threshold)
     targets, targets_image = target_points_detection(line_mask, 1)
 
     cv2.imshow('frame', image)
@@ -46,14 +46,14 @@ def test_blackline_detection(params, caps, driver):
 def test_parksign_detection(params, caps, driver):
     print('Testing parksign')
 
-    image = cv2.imread('./parksign/1.png', -1)
-    print('Parksign: {}'.format(parksign.detect_parksign(image, params)))
+    image = cv2.imread('./parksigns/1.png', -1)
+    print('Parksign: {}'.format(detect_parksign(image, params)))
     print('Test sign image -- OK')
 
     for i in itertools.count():
         frame = query_camera(caps[0], flip=True)
 
-        print('Parksign: {}'.format(detect_parksign(image, params.park_params)))
+        print('Parksign: {}'.format(detect_parksign(image, params)))
 
         cv2.imshow('frame', frame)
         c = cv2.waitKey(30)

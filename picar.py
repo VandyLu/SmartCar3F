@@ -16,7 +16,7 @@ ParkParams = namedtuple('ParkParams',
                         ['lower_blue',
                          'upper_blue',
                          'min_R',
-                         'max_R'
+                         'max_R',
                          'steer_kp',
                          'steer_ki',
                          'steer_kd'
@@ -56,7 +56,7 @@ class Picar():
     
 if __name__ == '__main__':
     # Test Picar
-    cruise_params = CruiseParams(threshold=64,
+    cruise_params = CruiseParams(threshold=100,
                                  steer_kp=1.0,
                                  steer_ki=0.0,
                                  steer_kd=0.0)
@@ -74,7 +74,8 @@ if __name__ == '__main__':
                          park_params = park_params) 
 
     picar = Picar(params)
-    picar.cruise()
+    #picar.cruise()
+    picar.test()
 
     print('Exit done!')
     picar.driver.close()

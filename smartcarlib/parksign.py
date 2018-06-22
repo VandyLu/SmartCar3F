@@ -7,12 +7,13 @@ def detect_parksign(image, params):
         
         return True if there is park sign in the image 
     '''
+    kernel_size = (2,2)
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     hsv = cv2.blur(hsv, kernel_size)
     #lower_blue = np.array([100, 100, 50])
     #upper_blue = np.array([130, 255, 255])
-    lower_blue = params.park_params.lower_blue
-    upper_blue = params.park_params.upper_blue
+    lower_blue = np.array(params.park_params.lower_blue)
+    upper_blue = np.array(params.park_params.upper_blue)
     mask = cv2.inRange(hsv, lower_blue, upper_blue)
 
     circles = cv2.HoughCircles(mask, cv2.HOUGH_GRADIENT, 

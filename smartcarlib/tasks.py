@@ -1,6 +1,7 @@
 import cv
 import cv2
 import driver
+import parksign
 import PID
 import utils
 import time
@@ -51,7 +52,7 @@ def cruise(params, caps, driver):
         #    pass
         cv2.imshow('frame', image)
         cv2.imshow('line', points_image)
-        c = cv2.waitKey(params.cruise_params.control_interval)
+        c = cv2.waitKey(params.control_interval)
 
         if ord('q') == c or 27 == c:
             break
