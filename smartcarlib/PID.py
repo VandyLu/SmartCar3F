@@ -1,3 +1,4 @@
+import numpy as np
 
 class PID():
     ''' A naive PID implementation '''
@@ -16,4 +17,5 @@ class PID():
         self.int_e += err
         self.last_e = err
 
+        self.int_e = np.clip(self.int_e, -30, 30)
         return output

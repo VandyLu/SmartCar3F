@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 from skimage import measure
 
-def blackline_detection(image, threshold=64, erode_iters=3):
+def blackline_detection(image, threshold=64, erode_iters=2):
     ''' Detect black line, do GaussianBlur or Closed operation to avoid errors
     '''
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -32,8 +32,8 @@ def calculate_center(image):
     valid_x = xmap[valid_mask]
     valid_y = ymap[valid_mask]
 
-    #if np.sum(valid_x) == 0 or np.sum(valid_y) == 0:
-    #    return None, None
+    if np.sum(valid_x) == 0 or np.sum(valid_y) == 0:
+        return width/2, height
 
     mean_x = np.mean(valid_x)
     mean_y = np.mean(valid_y)

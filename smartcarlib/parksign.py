@@ -16,11 +16,16 @@ def detect_parksign(image, params):
     upper_blue = np.array(params.park_params.upper_blue)
     mask = cv2.inRange(hsv, lower_blue, upper_blue)
 
+    mask = cv2.blur(mask, kernel_size)
+
     circles = cv2.HoughCircles(mask, cv2.HOUGH_GRADIENT, 
                                1, 200, param1=100, param2=50, 
                                minRadius = params.park_params.min_R, 
                                maxRadius = params.park_params.max_R)
+                            
 
+
+    print(circles)
     if isinstance(circles, type(None)):
         return False
     else:
