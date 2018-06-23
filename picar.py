@@ -37,7 +37,7 @@ class Picar():
         self.back = 1
         self.cap = [cv2.VideoCapture(i) for i in [1,0]]
         self.driver = None #
-        #self.driver = driver.driver()
+        self.driver = driver.driver()
 
     def cruise(self):
         tasks.cruise(self.params, self.cap, self.driver)
@@ -58,8 +58,8 @@ class Picar():
 if __name__ == '__main__':
     # Test Picar
     cruise_params = CruiseParams(threshold=100,
-                                 steer_kp=1.0,
-                                 steer_ki=0.05,
+                                 steer_kp=1.2,
+                                 steer_ki=0.01,
                                  steer_kd=0.0)
 
     park_params = ParkParams(lower_blue = [100, 100, 50],
@@ -75,9 +75,9 @@ if __name__ == '__main__':
                          park_params = park_params) 
 
     picar = Picar(params)
-    #picar.cruise()
+    picar.cruise()
     #picar.test()
-    picar.park()
+    #picar.park()
 
     print('Exit done!')
     picar.driver.close()

@@ -192,4 +192,4 @@ if __name__ == '__main__':
     cv2.imshow('mask', mask)
     cv2.imshow('result', result)
     cv2.setMouseCallback('img',getCord)
-cv2.waitKey()
+    cv2.waitKey()

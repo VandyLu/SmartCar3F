@@ -52,7 +52,7 @@ def target_points_detection(line_mask, num=1):
         if rect_mask.any():
             mean_x, mean_y = calculate_center(rect_mask)
             mean_y = height - (i+1)*hstep + mean_y
-            tars.append((x,y))
+            tars.append((mean_x,mean_y))
             tmp[int(mean_y-3): int(mean_y+3), int(mean_x-3): int(mean_x+3)] = 128
 
     tars = np.array(tars)

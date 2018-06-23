@@ -24,20 +24,28 @@ def cruise(params, caps, driver):
 
     image = utils.query_camera(caps[0], flip=True)
 
+    servo_last = 0
+    signal_last = time.time()
+
 
     for t in itertools.count():
         start_time = time.time()
 
         image = utils.query_camera(caps[0], flip=True)
         
-        cruise_roi = utils.crop(image, 0.2, 0.9)
+        cruise_roi = utils.crop(image, 0.1, 0.9)
         height, width, channels = cruise_roi.shape
 
         line_mask = cv.blackline_detection(cruise_roi, params.cruise_params.threshold)
         points, points_image = cv.target_points_detection(line_mask, 3)
 
         if points.shape[0] != 3:
-            driver.setStatus(motor = -0.1, servo = 0, mode = 'speed')
+            if time.time() - signal_last > 0.5:
+                driver.setStatus(motor = 0.05, servo = servo_last, mode = 'speed')
+                servo_last = np.clip(1.1 * servo_last, -1.0, 1.0)
+                signal_last = time.time()
+            #c = cv2.waitKey(params.control_interval)
+            c = cv2.waitKey(100)
             continue
 
         # Take the middle point as target
@@ -45,18 +53,23 @@ def cruise(params, caps, driver):
         cur_x, cur_y = points[0, 0], points[0, 1]
 
         error_x = (middle_x - cur_x) / width * 2 # [0,1]
+       	print(error_x)
         steer_value = steer_pid.update(error_x) # positive means turning right
         steer_value = np.clip(steer_value, -1.0, 1.0)
 
         # Motor speed
-        motor_value = 0.04
+        motor_value = 0.06
 
-        driver.setStatus(motor = motor_value, servo = steer_value, mode = 'speed')
+        if time.time() - signal_last > 0.5:
+            driver.setStatus(motor = motor_value, servo = steer_value, mode = 'speed')
+            signal_last = time.time()
+            servo_last = steer_value
 
         cv2.imshow('frame', image)
         cv2.imshow('roi', cruise_roi)
         cv2.imshow('line', points_image)
-        c = cv2.waitKey(params.control_interval)
+        #c = cv2.waitKey(params.control_interval)
+        c = cv2.waitKey(100)
 
         if ord('q') == c or 27 == c:
             break
