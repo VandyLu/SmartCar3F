@@ -45,7 +45,7 @@ class Picar():
     def park(self):
         ''' Park to specified plot
         '''
-        pass
+        task.park(self.params, self.cap, self.driver)
 
     def test(self):
         ''' Test to run on picar
@@ -76,7 +76,8 @@ if __name__ == '__main__':
 
     picar = Picar(params)
     #picar.cruise()
-    picar.test()
+    #picar.test()
+    picar.park()
 
     print('Exit done!')
     picar.driver.close()

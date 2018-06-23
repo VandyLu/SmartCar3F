@@ -85,5 +85,27 @@ def cruise(params, caps, driver):
 
 def park(params, caps, driver):
 
+    for t in itertools.count():
+        #img = utils.query_camera(caps[1], flip=False)
+        img = cv2.imread('./parklot/34.png', -1)
 
-    pass
+        img = parklot.park_preprocess(img)
+        mask = parklot.park_color_detection(img, 3)
+
+        src = parklot.park_contour_process(mask, img)
+        m = getm(img, src)
+
+        if not type(m) == type(None):
+            driver.setStatus(0.01, 0.0, mode='speed')
+            continue
+
+        result = cv2.warpPerspective(img, m, (img.shape[1]. img.shape[0]))
+        pt, p = parklot.getCar(img.shape[1], img.shape[0], m)
+        # p = (b, k)
+
+        cv2.circle(img, tuple(pt.astype(np.int32)), 3, color=[255, 0, 255], thickness=-1)
+
+        target = img.shape[1] // 2, img.shape[0] // 2
+        break
+
+
