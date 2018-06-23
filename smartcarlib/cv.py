@@ -32,9 +32,6 @@ def calculate_center(image):
     valid_x = xmap[valid_mask]
     valid_y = ymap[valid_mask]
 
-    if np.sum(valid_x) == 0 or np.sum(valid_y) == 0:
-        return width/2, height
-
     mean_x = np.mean(valid_x)
     mean_y = np.mean(valid_y)
     return mean_x, mean_y
@@ -47,16 +44,18 @@ def target_points_detection(line_mask, num=1):
     hstep = height // num
 
     tmp = line_mask.copy()
-    tars = np.zeros((num, 2), dtype=np.float32)
+    #tars = np.zeros((num, 2), dtype=np.float32)
+    tars = []
     for i in range(num):
         rect_mask = line_mask[height-(i+1)*hstep: height-i*hstep, :]
-        mean_x, mean_y = calculate_center(rect_mask)
-        mean_y = height - (i+1)*hstep + mean_y
 
-        tars[i, 0] = mean_x
-        tars[i, 1] = mean_y
+        if rect_mask.any():
+            mean_x, mean_y = calculate_center(rect_mask)
+            mean_y = height - (i+1)*hstep + mean_y
+            tars.append((x,y))
+            tmp[int(mean_y-3): int(mean_y+3), int(mean_x-3): int(mean_x+3)] = 128
 
-        tmp[int(mean_y-3): int(mean_y+3), int(mean_x-3): int(mean_x+3)] = 128
+    tars = np.array(tars)
 
     #cv2.imshow('tmp', tmp)
     #cv2.waitKey()

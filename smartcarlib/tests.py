@@ -48,8 +48,12 @@ def test_parksign_detection(params, caps, driver):
     print('Testing parksign')
 
     image = cv2.imread('./parksigns/1.png', -1)
+    print(image.shape)
     print('Parksign: {}'.format(detect_parksign(image, params)))
     print('Test sign image -- OK')
+
+    cv2.imshow('image', image)
+    cv2.waitKey()
 
     for i in itertools.count():
         frame = query_camera(caps[0], flip=True)

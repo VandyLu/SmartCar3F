@@ -24,7 +24,6 @@ def detect_parksign(image, params):
                                maxRadius = params.park_params.max_R)
                             
 
-
     print(circles)
     if isinstance(circles, type(None)):
         return False

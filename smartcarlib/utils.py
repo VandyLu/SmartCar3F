@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 
 
 def crop(image, hratio, wratio):
@@ -23,3 +24,12 @@ def query_camera(capture, flip=True):
         frame = frame[::-1, ::-1]
 
     return frame
+
+def loadparam():
+    mtx = np.loadtxt('./params/mtx.txt')
+    dist = np.loadtxt('./params/dist.txt')
+    return mtx, dist
+
+
+def undistort(img, mtx, dist):
+    return cv2.undistort(img,mtx,dist,None,mtx)  
