@@ -15,7 +15,7 @@ def getCord(event,x,y,flags,param):
 
 
 def park_preprocess(img):
-    #img = cv2.blur(img, (3,3))
+    img = cv2.blur(img, (3,3))
 
     if hsv:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -86,7 +86,7 @@ def park_contour_process(img, img_prv):
     print(approx)
 
     cv2.drawContours(img_prv, [approx], -1, (255, 255, 255), 1)
-    return result
+    return result[0], result[3]
 
 def resort(approx):
     x0 = approx[0][0][0]
