@@ -15,7 +15,7 @@ def getCord(event,x,y,flags,param):
 
 
 def park_preprocess(img):
-    img = cv2.blur(img, (3,3))
+    #img = cv2.blur(img, (3,3))
 
     if hsv:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -40,10 +40,11 @@ def park_color_detection(img, color):
 
         mask = cv2.inRange(img, lower, upper)
     else:
-        color_dic_lower = np.array([[70, 70, 50], [30,0,165], [0,150,140],[70,115,0]])
-        color_dic_upper = np.array([[95, 95, 75], [80,45,200],[30,180,180],[100,150,50]])
+        color_dic_lower = np.array([[70, 70, 50], [00,0,155], [0,150,140],[70,115,0]])
+        color_dic_upper = np.array([[95, 95, 75], [80,55,220],[30,180,180],[100,150,50]])
         lower = color_dic_lower[color]
         upper = color_dic_upper[color]
+        print(img.shape)
 
         mask = cv2.inRange(img, lower, upper)
 
@@ -66,9 +67,14 @@ def park_contour_process(img, img_prv):
             max_area = cv2.contourArea(cont)
 
     #  k important paremeter!!!
-    k = 0.02
-    epsilon = k*cv2.arcLength(cnt,True)
-    approx = cv2.approxPolyDP(cnt,epsilon,True)
+    for k in np.arange(0, 0.1, 0.01):
+        epsilon = k*cv2.arcLength(cnt,True)
+        approx = cv2.approxPolyDP(cnt,epsilon,True)
+        if approx.shape[0] == 4:
+            break
+    if not approx.shape[0] == 4:
+        return None
+
 
     result = np.squeeze(resort(approx),1)
 

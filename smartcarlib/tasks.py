@@ -116,21 +116,29 @@ def park(params, caps, driver):
     steer_pid = PID.PID(params.park_params.steer_kp,
                         params.park_params.steer_ki,
                         params.park_params.steer_kd)
+    cv2.waitKey(1000)
 
     for t in itertools.count():
-        #img = utils.query_camera(caps[1], flip=False)
-        img = cv2.imread('./parklot/27.png', -1)
+        img = utils.query_camera(caps[1], flip=False)
+        #img = cv2.imread('./parklot/27.png', -1)
 
         idx = params.park_params.parklot_idx
         img = parklot.park_preprocess(img)
 
-        mask = parklot.park_color_detection(img, 3)
+        mask = parklot.park_color_detection(img, idx)
 
         cv2.imshow('bin', mask)
+        cv2.imshow('img', img)
 
         mask_close = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((5,5), np.float32))
 
-        meanx, meany = calculate_center(mask_close)
+        if mask_close.any():
+            meanx, meany = calculate_center(mask_close)
+        else:
+            print('color failed')
+            cv2.waitKey(200)
+            continue
+            
         edge = cv2.Canny(img, 50, 150)
         #edge = cv2.dilate(edge, np.ones((3,3)))
         edge  = cv2.morphologyEx(edge, cv2.MORPH_CLOSE, np.ones((5,5), np.float32))
@@ -144,7 +152,6 @@ def park(params, caps, driver):
         while True:
             filled = edge - origin
             num_filled = np.sum(filled) / 255.0
-            print(num_filled)
             if num_filled < 1000:
                 for i in range(40):
                     if edge[int(meany), int(meanx+i)] < 1:
@@ -161,21 +168,22 @@ def park(params, caps, driver):
 
         cv2.circle(img, (int(meanx), int(meany)), 3, [255, 0, 0], -1) 
 
-        #if not valid:
-        #    continue
 
         src = parklot.park_contour_process(filled, img)
+        if type(src) == type(None) or not valid or src.shape[0] !=4 :
+            print('n_pt: {}'.format(src))
+            cv2.waitKey(200)
+            continue
         m = parklot.getm(img, src)
 
         if type(m) == type(None):
-            #driver.setStatus(0.01, 0.0, mode='speed')
             print(src)
             print('Fail')
-            #continue
+            cv2.waitKey(200)
+            continue
 
         result = cv2.warpPerspective(img, m, (img.shape[1], img.shape[0]))
         pt, theta = parklot.getCar(img.shape[1], img.shape[0], m)
-        print(pt)
         for i in range(src.shape[0]):
             cv2.circle(img, tuple(src[i].astype(np.int32)), 3, color=[0,255,0], thickness=-1)
 
@@ -184,13 +192,13 @@ def park(params, caps, driver):
         dy = 10
         alpha = (x1-x0)/(y1-y0)**2 
         grad_dydx = -1.0/(2*alpha*(y0-y1)**2)
-        fi = np.atan(grad_dydx)
+        fi = np.arctan(grad_dydx)
         
-        error = (fi - theta) # if +, should turn left ,steer +
+        error = (fi - theta) / np.pi # if +, should turn left ,steer +
         steer_value = steer_pid.update(error)
         steer_value = np.clip(steer_value, -1.0, 1.0)
         if clock.update():
-            driver.setStatus(-0.05, steer_value, mode='speed')
+            driver.setStatus(motor = -0.02, servo = steer_value, mode='speed')
 
         print('n_pt: {} | steer: {:.3f}'.format(src.shape[0], steer_value))
 
