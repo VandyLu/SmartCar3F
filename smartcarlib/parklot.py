@@ -15,14 +15,17 @@ def getCord(event,x,y,flags,param):
 
 
 def park_preprocess(img):
-    if hsv:
-        channels = cv2.split(img)
-        merge = [cv2.equalizeHist(i, i)for i in channels]
-        img = cv2.merge(merge)
+    img = cv2.blur(img, (3,3))
 
-        kernel = np.ones((5, 5), np.uint8)
-        img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
-        img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
+    if hsv:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        #channels = cv2.split(img)
+        #merge = [cv2.equalizeHist(i, i)for i in channels]
+        #img = cv2.merge(merge)
+
+        #kernel = np.ones((5, 5), np.uint8)
+        #img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
+        #img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
 
     return img
 
@@ -35,19 +38,14 @@ def park_color_detection(img, color):
         lower = color_dic_lower[color]
         upper = color_dic_upper[color]
 
-        img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        img_hsv_blur = cv2.GaussianBlur(img_hsv, (5, 5), 0)
-        mask = cv2.inRange(img_hsv_blur, lower, upper)
+        mask = cv2.inRange(img, lower, upper)
     else:
         color_dic_lower = np.array([[70, 70, 50], [30,0,165], [0,150,140],[70,115,0]])
-        color_dic_upper = np.array([[95, 95, 75], [60,45,200],[30,180,180],[100,150,50]])
+        color_dic_upper = np.array([[95, 95, 75], [80,45,200],[30,180,180],[100,150,50]])
         lower = color_dic_lower[color]
         upper = color_dic_upper[color]
 
         mask = cv2.inRange(img, lower, upper)
-        kernel = np.ones((5, 5), np.uint8)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-
 
     return mask
 
@@ -166,7 +164,8 @@ def getCar(width, height, m):
     y0 = lstart[1]
     y1 = lend[1]
 
-    p = np.mat([[1.0, x0], [1.0, x1]], np.float32).I * np.array([[y0], [y1]])
+    #p = np.mat([[1.0, x0], [1.0, x1]], np.float32).I * np.array([[y0], [y1]])
+    p = np.arctan2(y1-y0, x1-x0) - np.pi/2
     return middle_pt, p
 
 

@@ -19,7 +19,8 @@ ParkParams = namedtuple('ParkParams',
                          'max_R',
                          'steer_kp',
                          'steer_ki',
-                         'steer_kd'
+                         'steer_kd',
+                         'parklot_idx'
                         ])
 
 CruiseParams = namedtuple('CruiseParams',
@@ -35,9 +36,10 @@ class Picar():
 
         self.front = 0
         self.back = 1
-        self.cap = [cv2.VideoCapture(i) for i in [1,0]]
+        #self.cap = [cv2.VideoCapture(i) for i in [1,0]]
+        self.cap = []
         self.driver = None #
-        self.driver = driver.driver()
+        #self.driver = driver.driver()
 
     def cruise(self):
         tasks.cruise(self.params, self.cap, self.driver)
@@ -45,7 +47,7 @@ class Picar():
     def park(self):
         ''' Park to specified plot
         '''
-        task.park(self.params, self.cap, self.driver)
+        tasks.park(self.params, self.cap, self.driver)
 
     def test(self):
         ''' Test to run on picar
@@ -68,16 +70,17 @@ if __name__ == '__main__':
                              max_R = 300,
                              steer_kp = 1.0,
                              steer_ki = 0.0,
-                             steer_kd = 0.0)
+                             steer_kd = 0.0,
+                             parklot_idx = 1)
 
     params = PicarParams(control_interval=600,
                          cruise_params = cruise_params,
                          park_params = park_params) 
 
     picar = Picar(params)
-    picar.cruise()
+    #picar.cruise()
     #picar.test()
-    #picar.park()
+    picar.park()
 
     print('Exit done!')
     picar.driver.close()
