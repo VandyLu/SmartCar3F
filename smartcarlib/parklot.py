@@ -40,8 +40,8 @@ def park_color_detection(img, color):
 
         mask = cv2.inRange(img, lower, upper)
     else:
-        color_dic_lower = np.array([[70, 70, 50], [00,0,155], [0,150,140],[70,115,0]])
-        color_dic_upper = np.array([[95, 95, 75], [80,55,220],[30,180,180],[100,150,50]])
+        color_dic_lower = np.array([[70, 70, 50], [00,0,155], [0,150,140],[60,105,0]])
+        color_dic_upper = np.array([[95, 95, 75], [80,55,220],[30,180,180],[110,160,60]])
         lower = color_dic_lower[color]
         upper = color_dic_upper[color]
         print(img.shape)
@@ -67,14 +67,9 @@ def park_contour_process(img, img_prv):
             max_area = cv2.contourArea(cont)
 
     #  k important paremeter!!!
-    for k in np.arange(0, 0.1, 0.01):
-        epsilon = k*cv2.arcLength(cnt,True)
-        approx = cv2.approxPolyDP(cnt,epsilon,True)
-        if approx.shape[0] == 4:
-            break
-    if not approx.shape[0] == 4:
-        return None
-
+    k = 0.02
+    epsilon = k*cv2.arcLength(cnt,True)
+    approx = cv2.approxPolyDP(cnt,epsilon,True)
 
     result = np.squeeze(resort(approx),1)
 
@@ -86,6 +81,7 @@ def park_contour_process(img, img_prv):
     print(approx)
 
     cv2.drawContours(img_prv, [approx], -1, (255, 255, 255), 1)
+    cv2.imshow('prv', img_prv)
     return result[0], result[3]
 
 def resort(approx):

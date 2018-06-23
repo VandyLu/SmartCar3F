@@ -68,10 +68,10 @@ if __name__ == '__main__':
                              upper_blue = [130, 255, 255],
                              min_R = 10,
                              max_R = 300,
-                             steer_kp = 1.0,
+                             steer_kp = 5.0,
                              steer_ki = 0.01,
                              steer_kd = 0.0,
-                             parklot_idx = 1)
+                             parklot_idx = 3)
 
     params = PicarParams(control_interval=600,
                          cruise_params = cruise_params,

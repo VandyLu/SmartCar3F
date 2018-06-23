@@ -119,6 +119,8 @@ def park(params, caps, driver):
     cv2.waitKey(1000)
 
     stop_cnt = 0
+    stop_num = 0
+    servo_last = 0.0
 
     for t in itertools.count():
         img = utils.query_camera(caps[1], flip=False)
@@ -133,6 +135,7 @@ def park(params, caps, driver):
         cv2.imshow('img', img)
 
         mask_close = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((5,5), np.float32))
+        mask_close = cv2.morphologyEx(mask_close, cv2.MORPH_OPEN, np.ones((5,5), np.float32))
 
         if mask_close.any():
             meanx, meany = calculate_center(mask_close)
@@ -172,33 +175,36 @@ def park(params, caps, driver):
 
         src = parklot.park_contour_process(mask_close, img)
         pt_left, pt_right = src[0], src[1]
-        if pt_left[1] < 80 and pt_right[1] < 80:
+        print('meany:{}'.format(meany))
+        if 480 - meany < 40 and stop_num < 2:
             stop_cnt += 1
             # in lot
 
             if stop_cnt > 5:
-                break
+                if stop_num < 2:
+                    stop_num += 1
+                driver.setStatus(motor=0.012, servo=servo_last*0.0, mode='speed')
+                cv2.waitKey(3000)
+                driver.setStatus(motor=0.0, servo=0.0, mode='speed')
+                stop_cnt = 0
 
-        else:
-            # target
-            error = (img.shape[1]/2 - mean_x) / img.shape[1] 
-            servo = np.clip(steer_pid.update(error), -1.0, 1.0)
-            if clock.update():
-                driver.setStatus(motor=-0.02, servo =servo, mode='speed')
+        if stop_num == 2 and 480-meany < 20:
+            break
+
+        # target
+        error = (img.shape[1]/2 - meanx) / img.shape[1] 
+        servo = -np.clip(steer_pid.update(error), -1.0, 1.0)
+        if clock.update():
+            driver.setStatus(motor=-0.02, servo =servo, mode='speed')
+            servo_last = servo
+            print('servo: {}'.format(servo))
 
         
-        if type(src) == type(None) or not valid or src.shape[0] !=4 :
+        if type(src) == type(None):
             print('n_pt: {}'.format(src))
             cv2.waitKey(200)
             continue
-        m = parklot.getm(img, src)
-
-        if type(m) == type(None):
-            print(src)
-            print('Fail')
-            cv2.waitKey(200)
-            continue
-
+        #m = parklot.getm(img, src)
         #result = cv2.warpPerspective(img, m, (img.shape[1], img.shape[0]))
         #pt, theta = parklot.getCar(img.shape[1], img.shape[0], m)
         #for i in range(src.shape[0]):
